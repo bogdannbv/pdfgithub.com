@@ -75,22 +75,22 @@ func main() {
 			return
 		}
 
-		u.Path = strings.Replace(u.Path, "blob/", "", 1)
-		u.Scheme = "https"
-		u.Host = "raw.githubusercontent.com"
-		u.Query().Add("raw", "true")
-
 		if u.Path[len(u.Path)-4:] != ".pdf" {
-			logger.Error("missing .pdf extension", "url", r.URL.String())
+			logger.Debug("missing .pdf extension", "url", r.URL.String())
 			redirectHome(w, r)
 			return
 		}
 
-		logger.Info("redirecting", "url", u.String())
+		u.Scheme = "https"
+		u.Host = "raw.githubusercontent.com"
+		u.Path = strings.Replace(u.Path, "blob/", "", 1)
+		ghu := u.String()
 
-		rsp, err := hc.Get(u.String())
+		logger.Debug("fetching raw content", "url", ghu)
+
+		rsp, err := hc.Get(ghu)
 		if err != nil {
-			logger.Error("could not make request", "url", u.String(), "error", err)
+			logger.Error("could not make request", "url", ghu, "error", err)
 			// TODO: redirect to an error page? maybe?
 			redirectHome(w, r)
 			return
