@@ -33,8 +33,8 @@ func main() {
 		logger.Info("could not load .env file", "error", err)
 	}
 
-	if os.Getenv("APP_ENV") != "local" {
-		logLevel.Set(slog.LevelInfo)
+	if os.Getenv("APP_ENV") == "local" {
+		logLevel.Set(slog.LevelDebug)
 	}
 
 	host := os.Getenv("HTTP_BIND_HOST")
