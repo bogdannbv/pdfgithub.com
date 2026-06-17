@@ -10,7 +10,7 @@ RUN apk add build-base \
 FROM alpine:3.24
 
 COPY ./static /app/static
-COPY --from=build /src/pdfgithub /app/pdfgh
+COPY --from=build /src/pdfgh /app/pdfgh
 
 EXPOSE 80
 
