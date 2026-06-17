@@ -5,13 +5,13 @@ WORKDIR /src
 COPY . .
 
 RUN apk add build-base \
-    && go build -ldflags "-linkmode external -extldflags -static" -o pdfgithub -a .
+    && go build -ldflags "-linkmode external -extldflags -static" -o pdfgh -a .
 
-FROM scratch
+FROM alpine:3.24
 
-COPY ./static /static
-COPY --from=build /src/pdfgithub /pdfgithub
+COPY ./static /app/static
+COPY --from=build /src/pdfgithub /app/pdfgh
 
 EXPOSE 80
 
-CMD ["/pdfgithub"]
+CMD ["/app/pdfgh"]
