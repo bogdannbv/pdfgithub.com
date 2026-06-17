@@ -65,7 +65,6 @@ func main() {
 	}
 
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		logger.Info("request", "url", r.URL.String())
 		u, err := url.Parse(r.URL.String())
 		if err != nil {
 			logger.Error("could not parse url", "url", r.URL.String())
