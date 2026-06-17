@@ -55,9 +55,9 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	serveUsage := func(w http.ResponseWriter, r *http.Request) {
+	serveHome := func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		http.ServeFile(w, r, "static/usage.html")
+		http.ServeFile(w, r, "static/index.html")
 	}
 
 	redirectHome := func(w http.ResponseWriter, r *http.Request) {
@@ -65,13 +65,14 @@ func main() {
 	}
 
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("request", "url", r.URL.String())
 		u, err := url.Parse(r.URL.String())
 		if err != nil {
 			logger.Error("could not parse url", "url", r.URL.String())
 			return
 		}
 		if u.Path == "/" {
-			serveUsage(w, r)
+			serveHome(w, r)
 			return
 		}
 
