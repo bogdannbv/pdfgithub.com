@@ -46,4 +46,3 @@ http://localhost:8080
 | `HTTP_BIND_HOST` | Host address the HTTP server binds to.                    | `0.0.0.0`  |
 | `HTTP_BIND_PORT` | Port the HTTP server listens on.                          | `80`       |
 | `APP_ENV`        | Set to `local` to use debug-level logging.                | info-level |
-| `APP_HOST`       | Expected public request host, including port when needed. | required   |

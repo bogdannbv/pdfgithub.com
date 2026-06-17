@@ -51,12 +51,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	domain := os.Getenv("APP_HOST")
-	if domain == "" {
-		logger.Error("invalid domain")
-		os.Exit(1)
-	}
-
 	hc := &http.Client{}
 
 	mux := http.NewServeMux()
@@ -66,8 +60,8 @@ func main() {
 		http.ServeFile(w, r, "static/usage.html")
 	}
 
-	redirectUsage := func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/usage", http.StatusTemporaryRedirect)
+	redirectHome := func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
 
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
@@ -81,12 +75,6 @@ func main() {
 			return
 		}
 
-		if r.Host != domain {
-			logger.Error("invalid host", "host", u.Host)
-			redirectUsage(w, r)
-			return
-		}
-
 		u.Path = strings.Replace(u.Path, "blob/", "", 1)
 		u.Scheme = "https"
 		u.Host = "raw.githubusercontent.com"
@@ -94,7 +82,7 @@ func main() {
 
 		if u.Path[len(u.Path)-4:] != ".pdf" {
 			logger.Error("missing .pdf extension", "url", r.URL.String())
-			redirectUsage(w, r)
+			redirectHome(w, r)
 			return
 		}
 
@@ -104,7 +92,7 @@ func main() {
 		if err != nil {
 			logger.Error("could not make request", "url", u.String(), "error", err)
 			// TODO: redirect to an error page? maybe?
-			redirectUsage(w, r)
+			redirectHome(w, r)
 			return
 		}
 		defer rsp.Body.Close()
@@ -112,16 +100,11 @@ func main() {
 		if _, err = io.Copy(w, rsp.Body); err != nil {
 			logger.Error("could not copy body", "error", err)
 			// TODO: redirect to an error page? maybe?
-			redirectUsage(w, r)
-			return
+			redirectHome(w, r)
 		}
 	})
 
-	sfs := http.FileServer(http.Dir("static/"))
-
-	mux.Handle("GET /static/", http.StripPrefix("/static", sfs))
-
-	mux.HandleFunc("GET /usage", serveUsage)
+	mux.Handle("GET /static/", http.StripPrefix("/static", http.FileServer(http.Dir("static/"))))
 
 	server := &http.Server{
 		Addr:    net.JoinHostPort(host, port),
