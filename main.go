@@ -75,7 +75,7 @@ func main() {
 			return
 		}
 
-		if u.Path[len(u.Path)-4:] != ".pdf" {
+		if len(u.Path) < 4 || u.Path[len(u.Path)-4:] != ".pdf" {
 			logger.Debug("missing .pdf extension", "url", r.URL.String())
 			redirectHome(w, r)
 			return
