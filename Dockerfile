@@ -9,6 +9,8 @@ RUN apk add build-base \
 
 FROM alpine:3.24
 
+WORKDIR /app
+
 COPY ./static /app/static
 COPY --from=build /src/pdfgh /app/pdfgh
 
