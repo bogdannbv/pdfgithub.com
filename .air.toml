@@ -4,8 +4,8 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  bin = "./tmp/pdfgithub"
-  cmd = "go build -o ./tmp/pdfgithub ."
+  bin = "./tmp/pdfgh"
+  cmd = "go build -o ./tmp/pdfgh ./cmd"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []
