@@ -46,7 +46,9 @@ func (p *BlobPath) RawPath() string {
 
 var commitLike = regexp.MustCompile(`(?i)^([0-9a-f]{7}|[0-9a-f]{40}|[0-9a-f]{64})$`)
 
-func (p *BlobPath) MediaCandidates() []*MediaCandidate {
+// MediaCandidates generates a list of potential MediaCandidate objects by splitting and escaping the refPath component.
+// The method returns at most 'limit' candidates, stopping earlier if sufficient candidates are found.
+func (p *BlobPath) MediaCandidates(limit int) []*MediaCandidate {
 	parts := strings.Split(p.refPath, "/")
 
 	for i := 0; i < len(parts); i++ {
@@ -56,7 +58,7 @@ func (p *BlobPath) MediaCandidates() []*MediaCandidate {
 	o := url.PathEscape(p.owner)
 	r := url.PathEscape(p.repo)
 
-	if len(parts) == 2 && commitLike.MatchString(parts[0]) {
+	if commitLike.MatchString(parts[0]) {
 		return []*MediaCandidate{{
 			Owner: o,
 			Repo:  r,
@@ -68,6 +70,10 @@ func (p *BlobPath) MediaCandidates() []*MediaCandidate {
 	var candidates []*MediaCandidate
 
 	for i := len(parts) - 1; i >= 0; i-- {
+		if len(candidates) >= limit {
+			break
+		}
+
 		candidates = append(candidates, &MediaCandidate{
 			Owner: o,
 			Repo:  r,

@@ -53,7 +53,7 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mcs := bp.MediaCandidates()
+	mcs := bp.MediaCandidates(11)
 	if len(mcs) == 0 {
 		a.log.Error("could not find any candidates for the given path", "path", u.Path, "error", err)
 		redirectIndex(w, r)
