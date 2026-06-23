@@ -3,6 +3,6 @@ package httpx
 const (
 	MIMEApplicationJSON = "application/json"
 	MIMEOctetStream     = "application/octet-stream"
-	MIMEPdf             = "application/pdf"
+	MIMEPDF             = "application/pdf"
 	MIMEPlainText       = "text/plain"
 )
