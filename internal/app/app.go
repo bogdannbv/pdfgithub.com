@@ -141,6 +141,10 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rsp.Body.Close()
 
+	// for some reason some PDFs on GitHub are text/plain :/
+	// therefore, we're forcing PDF content-type.
+	w.Header().Set("Content-Type", httpx.MIMEPDF)
+
 	if _, err = io.Copy(w, rsp.Body); err != nil {
 		a.log.Debug("could not copy body", "error", err)
 		// TODO: redirect to an error page? maybe?
