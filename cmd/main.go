@@ -65,8 +65,11 @@ func main() {
 	a := app.New(log, ac)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", a.HandleGet)
 	mux.Handle("GET /static/", http.StripPrefix("/static", http.FileServer(http.Dir("static/"))))
+	mux.HandleFunc("GET /favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/favicon.ico")
+	})
+	mux.HandleFunc("GET /", a.HandleGet)
 
 	server := &http.Server{
 		Addr:    net.JoinHostPort(host, port),
