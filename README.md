@@ -41,8 +41,9 @@ http://localhost:8080
 
 ## Configuration
 
-| Variable         | Description                                               | Default    |
-|------------------|-----------------------------------------------------------|------------|
-| `HTTP_BIND_HOST` | Host address the HTTP server binds to.                    | `0.0.0.0`  |
-| `HTTP_BIND_PORT` | Port the HTTP server listens on.                          | `80`       |
-| `APP_ENV`        | Set to `local` to use debug-level logging.                | info-level |
+| Variable         | Description                                           | Default            |
+|------------------|-------------------------------------------------------|--------------------|
+| `HTTP_BIND_HOST` | Host address the HTTP server binds to.                | `0.0.0.0`          |
+| `HTTP_BIND_PORT` | Port the HTTP server listens on.                      | `80`               |
+| `APP_ENV`        | Set to `local` to use debug-level logging.            | info-level         |
+| `GH_TOKEN`       | GH Personal access token with public repo read access | none, **required** |
