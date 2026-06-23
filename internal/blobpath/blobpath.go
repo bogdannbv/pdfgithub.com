@@ -46,9 +46,9 @@ func (p *BlobPath) RawPath() string {
 
 var commitLike = regexp.MustCompile(`(?i)^([0-9a-f]{7}|[0-9a-f]{40}|[0-9a-f]{64})$`)
 
-// MediaCandidates generates a list of potential MediaCandidate objects by splitting and escaping the refPath component.
+// ContentCandidates generates a list of potential ContentCandidate objects by splitting and escaping the refPath component.
 // The method returns at most 'limit' candidates, stopping earlier if sufficient candidates are found.
-func (p *BlobPath) MediaCandidates(limit int) []*MediaCandidate {
+func (p *BlobPath) ContentCandidates(limit int) []*ContentCandidate {
 	parts := strings.Split(p.refPath, "/")
 
 	for i := 0; i < len(parts); i++ {
@@ -59,7 +59,7 @@ func (p *BlobPath) MediaCandidates(limit int) []*MediaCandidate {
 	r := url.PathEscape(p.repo)
 
 	if commitLike.MatchString(parts[0]) {
-		return []*MediaCandidate{{
+		return []*ContentCandidate{{
 			Owner: o,
 			Repo:  r,
 			Ref:   parts[0],
@@ -67,14 +67,14 @@ func (p *BlobPath) MediaCandidates(limit int) []*MediaCandidate {
 		}}
 	}
 
-	var candidates []*MediaCandidate
+	var candidates []*ContentCandidate
 
 	for i := len(parts) - 1; i >= 0; i-- {
 		if len(candidates) >= limit {
 			break
 		}
 
-		candidates = append(candidates, &MediaCandidate{
+		candidates = append(candidates, &ContentCandidate{
 			Owner: o,
 			Repo:  r,
 			Ref:   url.QueryEscape(path.Join(parts[:i]...)),
@@ -89,14 +89,14 @@ func (p *BlobPath) String() string {
 	return path.Join(p.owner, p.repo, "blob", p.refPath)
 }
 
-type MediaCandidate struct {
+type ContentCandidate struct {
 	Owner string
 	Repo  string
 	Ref   string
 	Path  string
 }
 
-func (mc *MediaCandidate) String() string {
+func (mc *ContentCandidate) String() string {
 	return fmt.Sprintf(
 		"/repos/%s/%s/contents/%s?ref=%s",
 		mc.Owner,

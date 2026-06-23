@@ -53,8 +53,8 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mcs := bp.MediaCandidates(11)
-	if len(mcs) == 0 {
+	ccs := bp.ContentCandidates(11)
+	if len(ccs) == 0 {
 		a.log.Error("could not find any candidates for the given path", "path", u.Path, "error", err)
 		redirectIndex(w, r)
 		return
@@ -63,11 +63,11 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	reqs := make([]*http.Request, len(mcs))
-	for i, mc := range mcs {
-		reqs[i], err = a.ac.NewRequest(ctx, http.MethodGet, mc.String(), nil)
+	reqs := make([]*http.Request, len(ccs))
+	for i, cc := range ccs {
+		reqs[i], err = a.ac.NewRequest(ctx, http.MethodGet, cc.String(), nil)
 		if err != nil {
-			a.log.Error("could not create request", "path", mc.String(), "error", err)
+			a.log.Error("could not create request", "path", cc.String(), "error", err)
 			continue
 		}
 	}
@@ -93,22 +93,22 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 				return nil
 			}
 
-			var rbody struct {
+			var body struct {
 				Type        string `json:"type"`
 				DownloadURL string `json:"download_url"`
 			}
-			if err = json.NewDecoder(rsp.Body).Decode(&rbody); err != nil {
+			if err = json.NewDecoder(rsp.Body).Decode(&body); err != nil {
 				errCh <- fmt.Errorf("could not decode response: %w", err)
 				return nil
 			}
 
-			if rbody.Type != "file" || rbody.DownloadURL == "" {
+			if body.Type != "file" || body.DownloadURL == "" {
 				errCh <- fmt.Errorf("type is not file or download url is empty")
 				return nil
 			}
 
 			select {
-			case resultCh <- rbody.DownloadURL:
+			case resultCh <- body.DownloadURL:
 				cancel()
 			default:
 			}
@@ -117,12 +117,9 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	go func() {
-		defer close(resultCh)
-		defer close(errCh)
-		if err = eg.Wait(); err != nil {
-			// should be unreachable
-			a.log.Debug("could not wait for download url", "error", err)
-		}
+		_ = eg.Wait()
+		close(resultCh)
+		close(errCh)
 	}()
 
 	dlu, ok := <-resultCh
@@ -149,32 +146,6 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 		// TODO: redirect to an error page? maybe?
 		redirectIndex(w, r)
 	}
-}
-
-func (a *App) githubContentUrl(ctx context.Context, mc *blobpath.MediaCandidate) (string, error) {
-	rsp, err := a.ac.Get(ctx, mc.String())
-	if err != nil {
-		return "", fmt.Errorf("could not make request: %w", err)
-	}
-	defer rsp.Body.Close()
-
-	if rsp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("unexpected status code: %d", rsp.StatusCode)
-	}
-
-	var rbody struct {
-		Type        string `json:"type"`
-		DownloadURL string `json:"download_url"`
-	}
-	if err = json.NewDecoder(rsp.Body).Decode(&rbody); err != nil {
-		return "", fmt.Errorf("could not decode response: %w", err)
-	}
-
-	if rbody.Type != "file" {
-		return "", fmt.Errorf("type is not file")
-	}
-
-	return rbody.DownloadURL, nil
 }
 
 func serveIndex(w http.ResponseWriter, r *http.Request) {
