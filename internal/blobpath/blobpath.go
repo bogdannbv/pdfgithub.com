@@ -58,20 +58,27 @@ func (p *BlobPath) ContentCandidates(limit int) []*ContentCandidate {
 	o := url.PathEscape(p.owner)
 	r := url.PathEscape(p.repo)
 
+	var candidates []*ContentCandidate
+
+	commit := false
 	if commitLike.MatchString(parts[0]) {
-		return []*ContentCandidate{{
+		commit = true
+		candidates = append(candidates, &ContentCandidate{
 			Owner: o,
 			Repo:  r,
-			Ref:   parts[0],
-			Path:  parts[1],
-		}}
+			Ref:   url.QueryEscape(parts[0]),
+			Path:  path.Join(parts[1:]...),
+		})
 	}
-
-	var candidates []*ContentCandidate
 
 	for i := len(parts) - 1; i >= 0; i-- {
 		if len(candidates) >= limit {
 			break
+		}
+
+		if commit && i == 1 {
+			// continue if we already "detected" a commit because we already added the candidate as the first element
+			continue
 		}
 
 		candidates = append(candidates, &ContentCandidate{
