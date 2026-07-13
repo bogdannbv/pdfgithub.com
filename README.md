@@ -1,4 +1,4 @@
-# pdfgithub.com
+# [pdfgithub.com](https://pdfgithub.com)
 
 Open GitHub PDF files directly in the browser by prefixing `github.com` with
 `pdf`.
