@@ -17,7 +17,7 @@ streams the PDF response back to the browser.
 2. Replace `github.com` with `pdfgithub.com`.
 3. Open the new URL in your browser.
 
-The root page and `/usage` show a small usage guide.
+The root (`/`) page shows a small usage guide.
 
 ## Run Locally
 
