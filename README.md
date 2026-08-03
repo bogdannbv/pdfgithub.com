@@ -30,7 +30,7 @@ cp .env.example .env
 Run the app:
 
 ```sh
-go run .
+go run ./cmd
 ```
 
 With the default example config, open:

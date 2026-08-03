@@ -97,8 +97,8 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 				Type        string `json:"type"`
 				DownloadURL string `json:"download_url"`
 			}
-			if err = json.NewDecoder(rsp.Body).Decode(&body); err != nil {
-				errCh <- fmt.Errorf("could not decode response: %w", err)
+			if decErr := json.NewDecoder(rsp.Body).Decode(&body); decErr != nil {
+				errCh <- fmt.Errorf("could not decode response: %w", decErr)
 				return nil
 			}
 
@@ -140,6 +140,9 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer rsp.Body.Close()
+
+	if rsp.StatusCode != http.StatusOK {
+	}
 
 	// for some reason some PDFs on GitHub are text/plain :/
 	// therefore, we're forcing PDF content-type.
