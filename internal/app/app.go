@@ -141,9 +141,6 @@ func (a *App) HandleGet(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rsp.Body.Close()
 
-	if rsp.StatusCode != http.StatusOK {
-	}
-
 	// for some reason some PDFs on GitHub are text/plain :/
 	// therefore, we're forcing PDF content-type.
 	w.Header().Set("Content-Type", httpx.MIMEPDF)
