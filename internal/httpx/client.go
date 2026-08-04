@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 )
 
 type Client struct {
@@ -88,8 +89,8 @@ func (c *Client) NewRequest(ctx context.Context, method string, path string, bod
 	return req, nil
 }
 
-func (c *Client) joinPath(path string) (string, error) {
-	pu, err := url.Parse(path)
+func (c *Client) joinPath(p string) (string, error) {
+	pu, err := url.Parse(p)
 	if err != nil {
 		return "", err
 	}
@@ -98,11 +99,10 @@ func (c *Client) joinPath(path string) (string, error) {
 	}
 
 	pu.Scheme = c.baseUrl.Scheme
+	pu.User = c.baseUrl.User
 	pu.Host = c.baseUrl.Host
-	p, err := url.JoinPath(c.baseUrl.Path, pu.Path)
-	if err != nil {
-		return "", err
-	}
-	pu.Path = p
+	pu.Path = path.Join(c.baseUrl.Path, pu.Path)
+	pu.RawPath = ""
+
 	return pu.String(), nil
 }
